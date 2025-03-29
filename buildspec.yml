@@ -1,0 +1,43 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.8
+    commands:
+      - echo Installing dependencies...
+      - pip install requests beautifulsoup4
+      - wget https://releases.hashicorp.com/terraform/1.0.11/terraform_1.0.11_linux_amd64.zip
+      - unzip terraform_1.0.11_linux_amd64.zip
+      - mv terraform /usr/local/bin/
+      - terraform --version
+      
+  pre_build:
+    commands:
+      - echo Starting pre-build phase...
+      - cd environments/$ENV
+      - terraform init
+      
+  build:
+    commands:
+      - echo Starting build phase...
+      - terraform plan -out=tfplan
+      - terraform apply -auto-approve tfplan
+      - WEBSITE_URL=$(terraform output -raw website_endpoint)
+      - echo "Website URL: $WEBSITE_URL"
+      - aws s3 cp ../../index.html s3://$(terraform output -raw website_bucket_name)/
+      
+  post_build:
+    commands:
+      - echo Starting tests...
+      - cd ../../tests
+      - export WEBSITE_URL=http://$(cd ../environments/$ENV && terraform output -raw website_endpoint)
+      - python test_website.py
+      - echo Tests completed successfully!
+
+artifacts:
+  files:
+    - index.html
+    - appspec.yml
+    - scripts/**/*
+  base-directory: '.'
