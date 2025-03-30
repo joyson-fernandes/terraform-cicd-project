@@ -46,9 +46,16 @@ resource "aws_iam_policy" "codepipeline_policy" {
       {
         Effect = "Allow",
         Action = [
-          "sns:Publish"  # Add SNS Publish permission
+          "sns:Publish"
         ],
-        Resource = "*"   # You can restrict this to specific SNS topics if needed
+        Resource = "*"
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "codestar-connections:UseConnection"
+        ],
+        Resource = "arn:aws:codestar-connections:eu-west-2:061051257340:connection/b81bf3ee-47f8-44a1-ad8d-e0ab22666ae9"
       }
     ]
   })
