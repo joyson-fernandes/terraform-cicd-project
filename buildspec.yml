@@ -15,7 +15,6 @@ phases:
   pre_build:
     commands:
       - echo Starting pre-build phase...
-      # Directory Structure Verification
       - echo "Verifying repository structure..."
       - test -f index.html || { echo "index.html is missing!"; exit 1; }
       - test -f error.html || { echo "error.html is missing!"; exit 1; }
@@ -28,19 +27,14 @@ phases:
       - echo Starting build phase...
       - terraform plan -out=tfplan -input=false
       - terraform apply -auto-approve tfplan
-      
-      # Handle different output variable names based on environment
       - |
         if [ "$ENV" = "prod" ]; then
-          # Check outputs.tf in your prod directory to confirm these exact variable names
           BUCKET_ID=$(terraform output -raw prod_website_bucket_id 2>/dev/null || terraform output -raw website_bucket_id)
           WEBSITE_URL=$(terraform output -raw website_endpoint 2>/dev/null || terraform output -raw cloudfront_domain_name)
         else
-          # Check outputs.tf in your dev directory to confirm these exact variable names
           BUCKET_ID=$(terraform output -raw website_bucket_id)
           WEBSITE_URL=$(terraform output -raw website_endpoint)
         fi
-      
       - echo "Website URL: $WEBSITE_URL"
       - echo "Bucket ID: $BUCKET_ID"
       - aws s3 cp ../../index.html s3://$BUCKET_ID/
@@ -52,7 +46,6 @@ phases:
       - cd ../../tests
       - export WEBSITE_URL=http://$WEBSITE_URL
       - echo "Testing website at URL: $WEBSITE_URL"
-      # Error Handling with meaningful messages
       - |
         if ! python test_website.py; then
           echo "Tests failed! Website does not meet requirements."
