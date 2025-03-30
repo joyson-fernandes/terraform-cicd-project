@@ -1,5 +1,7 @@
 resource "aws_iam_role" "codebuild_role" {
   name = "codebuild-terraform-role"
+  
+  # This argument is required for aws_iam_role
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
@@ -17,6 +19,7 @@ resource "aws_iam_role" "codebuild_role" {
 resource "aws_iam_policy" "codebuild_policy" {
   name        = "codebuild-terraform-policy"
   description = "Policy for CodeBuild to access required services"
+  
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
@@ -68,6 +71,15 @@ resource "aws_iam_policy" "codebuild_policy" {
         ],
         Resource = [
           "arn:aws:s3:::*"
+        ]
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "cloudfront:*"
+        ],
+        Resource = [
+          "*"
         ]
       }
     ]
