@@ -20,7 +20,7 @@ resource "aws_codepipeline" "terraform_pipeline" {
       
       configuration = {
         ConnectionArn    = aws_codestarconnections_connection.github.arn
-        FullRepositoryId = "yourusername/terraform-cicd-project"
+        FullRepositoryId = "joyson-fernandes/terraform-cicd-project"
         BranchName       = "main"
       }
     }
