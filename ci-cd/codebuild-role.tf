@@ -60,6 +60,15 @@ resource "aws_iam_policy" "codebuild_policy" {
           "dynamodb:DeleteItem"
         ],
         Resource = "arn:aws:dynamodb:*:*:table/terraform-locks"
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "s3:*"
+        ],
+        Resource = [
+          "arn:aws:s3:::*"
+        ]
       }
     ]
   })
